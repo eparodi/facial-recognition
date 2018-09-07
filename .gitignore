@@ -1,3 +1,5 @@
 venv/
 att_faces/
 .vscode/
+*.pyc
+octave-workspace

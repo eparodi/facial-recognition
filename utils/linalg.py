@@ -82,6 +82,13 @@ def _sortEig(eigenValues, eigenVectors):
     return sortedEigVals, sortedEigVecs
 
 
+def _getPseudoInverseSingularValues(singValues, m):
+    sInvValues = [1/x for x in singValues.A1]
+    sInv = np.eye(m.shape[1], m.shape[0])
+    np.fill_diagonal(sInv, sInvValues)
+    return sInv
+
+
 def svd(m: np.matrix):
     """ Returns the SVD of a matrix.
 
@@ -103,13 +110,20 @@ def svd(m: np.matrix):
     """
     rows, columns = m.shape
     if rows > columns:
-        svdMatrix = m.transpose() * m
+        svdMatrix = m.transpose() @ m
         singValues, vMatrix = symmetricEig(svdMatrix)
         singValues, vMatrix = _sortEig(singValues, vMatrix)
         singValues = np.sqrt(singValues)
+
+        sInv = _getPseudoInverseSingularValues(singValues, m)
+        uMatrix = m @ vMatrix @ sInv
     else:
         svdMatrix = m * m.transpose()
         singValues, uMatrix = symmetricEig(svdMatrix)
         singValues, uMatrix = _sortEig(singValues, uMatrix)
         singValues = np.sqrt(singValues)
+
+        sInv = _getPseudoInverseSingularValues(singValues, m)
+        vMatrix = m.transpose() @ uMatrix @ sInv.transpose()
+    
     return uMatrix, singValues, vMatrix

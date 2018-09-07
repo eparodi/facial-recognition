@@ -8,8 +8,11 @@ a = np.matrix([
     [2,3,5]
 ])
 
-# q, r = linalg.gramSchmidtQR(a)
-# print(q * r)
-# vals, vectors = linalg.symmetric_eig(a)
-# print('eigenvalues =\n{} \neigenvectors =\n{}'.format(vals, vectors))
-linalg.svd(a)
+u, s, v = linalg.svd(a)
+print( '\
+        u = \n{}\n\
+        s = \n{}\n\
+        v = \n{}'.format(u,s,v))
+sMatrix = np.eye(a.shape[0], a.shape[1])
+np.fill_diagonal(sMatrix, s.A1)
+print(u * sMatrix * v.T)

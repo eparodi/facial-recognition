@@ -10,6 +10,7 @@ from scipy import ndimage as im
 import numpy as np
 import matplotlib.pyplot as plt
 from sklearn import svm
+from sklearn.externals import joblib
 
 mypath      = 'att_faces/'
 onlydirs    = [f for f in listdir(mypath) if isdir(join(mypath, f))]
@@ -66,6 +67,7 @@ imagetst= [imagetst[k,:]-meanimage for k in range(imagetst.shape[0])]
 
 #PCA
 U,S,V = np.linalg.svd(images,full_matrices = False)
+joblib.dump(V, 'eigenfaces.pkl')
 
 #Primera autocara...
 eigen1 = (np.reshape(V[0,:],[versize,horsize]))*255
@@ -92,13 +94,16 @@ for neigen in range(1,nmax):
     #proyecto
     improy      = np.dot(images,np.transpose(B))
     imtstproy   = np.dot(imagetst,np.transpose(B))
-        
+
     #SVM
     #entreno
     clf = svm.LinearSVC()
     clf.fit(improy,person.ravel())
     accs[neigen] = clf.score(imtstproy,persontst.ravel())
     print('Precisión con {0} autocaras: {1} %\n'.format(neigen,accs[neigen]*100))
+
+    if neigen == nmax - 1:
+        joblib.dump(clf, 'model.pkl')
 
 fig, axes = plt.subplots(1,1)
 axes.semilogy(range(nmax),(1-accs)*100)

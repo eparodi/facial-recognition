@@ -8,11 +8,6 @@ a = np.matrix([
     [2,3,5]
 ])
 
-u, s, v = linalg.svd(a)
-print( '\
-        u = \n{}\n\
-        s = \n{}\n\
-        v = \n{}'.format(u,s,v))
-sMatrix = np.eye(a.shape[0], a.shape[1])
-np.fill_diagonal(sMatrix, s.A1)
-print(u * sMatrix * v.T)
+_, s, v = linalg.svd(a)
+print(s)
+print(v)

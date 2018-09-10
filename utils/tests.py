@@ -105,5 +105,13 @@ class LinearAlgebraTests(unittest.TestCase):
             self.assertTrue(self.check_simmilarity(firstValue, secondValue))
 
 
+    def test_svd(self):
+        matrix = self.MATRIX_2
+        S,V,D = np.linalg.svd(matrix)
+        S2, V2, D2 = linalg.svd(matrix)
+        self.assertTrue(self.check_simmilarity(S, S2))
+        self.assertTrue(self.check_list(V, V2))
+        self.assertTrue(self.check_simmilarity(D, D2))
+
 if __name__ == '__main__':
     unittest.main()

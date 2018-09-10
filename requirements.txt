@@ -1,4 +1,5 @@
 astroid==2.0.4
+autopep8==1.4
 backcall==0.1.0
 cycler==0.10.0
 decorator==4.3.0
@@ -12,11 +13,15 @@ lazy-object-proxy==1.3.1
 matplotlib==2.2.3
 mccabe==0.6.1
 numpy==1.15.1
+opencv-python==3.4.3.18
 parso==0.3.1
 pexpect==4.6.0
 pickleshare==0.7.4
+Pillow==5.2.0
+pkg-resources==0.0.0
 prompt-toolkit==1.0.15
 ptyprocess==0.6.0
+pycodestyle==2.4.0
 Pygments==2.2.0
 pylint==2.1.1
 pyparsing==2.2.0

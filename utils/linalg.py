@@ -126,8 +126,9 @@ def symmetricEig(m: np.matrix):
 
 
 def _sortEig(eigenValues, eigenVectors):
-    idx = np.flip(eigenValues.argsort().tolist())[0]
-    sortedEigVals = eigenValues[:, idx]
+    eigenValues = np.array(eigenValues)
+    idx = np.flip(eigenValues.argsort().tolist())
+    sortedEigVals = eigenValues[idx]
     sortedEigVecs = eigenVectors[:, idx]
     return sortedEigVals, sortedEigVecs
 
@@ -152,19 +153,28 @@ def svd(m: np.matrix):
         also a orthogonal matrix.
     """
     rows, columns = m.shape
-    if rows > columns:
-        svdMatrix = m.transpose() @ m
+    if rows < columns:
+        import ipdb; ipdb.set_trace()
+        svdMatrix = m.T @ m
         singValues, vMatrix = symmetricEig(svdMatrix)
         singValues, vMatrix = _sortEig(singValues, vMatrix)
         singValues = np.sqrt(singValues)
 
-        return None, singValues, vMatrix
+        sInvValues = [1/x for x in singValues]
+        sInv = np.eye(m.shape[1], m.shape[0])
+        np.fill_diagonal(sInv, sInvValues)
+        uMatrix = m @ vMatrix @ sInv
+        return uMatrix, singValues[:rows], vMatrix.T
     else:
-        svdMatrix = m * m.transpose()
+        svdMatrix = m @ m.transpose()
         singValues, uMatrix = symmetricEig(svdMatrix)
         singValues, uMatrix = _sortEig(singValues, uMatrix)
         singValues = np.sqrt(singValues)
 
-        return singValues, vMatrix, None
+        sInvValues = [1/x for x in singValues]
+        sInv = np.eye(m.shape[1], m.shape[0])
+        np.fill_diagonal(sInv, sInvValues)
+        vMatrix = m.T @ uMatrix @ sInv.T
+        return uMatrix, singValues[:columns], vMatrix.T
 
     return uMatrix, singValues, vMatrix

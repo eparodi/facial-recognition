@@ -9,6 +9,8 @@ class InvalidMatrixException(Exception):
 def gramSchmidtQR(m: np.matrix):
     """ Returns the matrices of the QR decomposition of the matrix.
 
+    The columns of the matrix should have all its columns linearly independent.
+
     Parameters
     ----------
     m: np.matrix
@@ -22,32 +24,59 @@ def gramSchmidtQR(m: np.matrix):
         The matrix R of the decomposition. This is an upper triangular
         matrix.
 
+    Raises
+    ------
+    InvalidMatrixException
+        If the matrix columns is bigger or equals than the number of rows.
     """
     rows, columns = m.shape
-    qMatrix = np.matlib.zeros((rows, rows))
-    qMatrix[:, 0] = m[:, 0] / np.linalg.norm(m[:, 0], 2)
-    for i in range(1, columns):
-        qColumn = m[:, i]
-        for j in range(0, i):
-            aux = np.dot(qMatrix[:, j].transpose(), m[:, i])
-            aux = aux[0, 0] * qMatrix[:, j]
-            qColumn = qColumn - aux
-        qMatrix[:, i] = qColumn / np.linalg.norm(qColumn, 2)
-    rMatrix = np.transpose(qMatrix) @ m
+    if columns > rows:
+        raise InvalidMatrixException('Invalid size.')
+    m = np.float64(m.copy())
+    rMatrix = np.matlib.zeros((columns, columns))
+    qMatrix = np.matlib.zeros((rows, columns))
+    for i in range(columns):
+        aux = m[:, i]
+        for k in range(i):
+            rMatrix[k, i] = qMatrix[:, k].T @ m[:, i]
+            aux = aux - rMatrix[k, i] * qMatrix[:, k]
+        rMatrix[i, i] = np.linalg.norm(aux)
+        qMatrix[:, i] = aux / rMatrix[i, i]
     return qMatrix, rMatrix
 
 
-def moddedgramSchmidtQR(m):
+def householderQR(m: np.matrix):
+    """ Returns the matrices of the complete QR decomposition of the matrix.
+
+    Parameters
+    ----------
+    m: np.matrix
+        The matrix to decompose.
+
+    Returns
+    -------
+    np.matrix:
+        The matrix Q of the decomposition. This is an orthonormal matrix.
+    np.matrix:
+        The matrix R of the decomposition. This is an upper triangular
+        matrix.
+
+    """
     rows, columns = m.shape
-    qMatrix = np.matlib.zeros((rows, rows))
-    rMatrix = np.matlib.zeros((rows, rows))
-    for k in range(0, rows):
-        w = m[:, k]
-        for j in range(0, rows):
-            rMatrix[j, k] = qMatrix[:, j].transpose() * w
-            w = w - (rMatrix[j, k] * qMatrix[:, j])
-        rMatrix[k, k] = np.linalg.norm(w, 2)
-        qMatrix[:, k] = w / rMatrix[k, k]
+    rMatrix = np.copy(m)
+    qMatrix = np.eye(rows)
+    for i in range(columns - (rows == columns)):
+        hMatrix = np.eye(rows)
+        xVector = rMatrix[i:, i]
+        auxVector = xVector / \
+            (xVector[0] + np.copysign(np.linalg.norm(xVector), xVector[0]))
+        auxVector[0] = 1
+        hMatrix[i:, i:] = np.eye(xVector.shape[0])
+        hMatrix[i:, i:] -= (2 / np.dot(auxVector, auxVector)) * \
+            np.dot(auxVector[:, None], auxVector[None, :])
+        # hMatrix[i:, i:] = make_householder(A[i:, i])
+        qMatrix = qMatrix @ hMatrix
+        rMatrix = hMatrix @ rMatrix
     return qMatrix, rMatrix
 
 

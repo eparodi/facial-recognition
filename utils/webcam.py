@@ -14,8 +14,8 @@ cap = cv2.VideoCapture(0)
 CV_WIDTH = 3
 CV_HEIGHT = 4
 
-data_width = 112
-data_height = 92
+data_width = 92
+data_height = 112
 area_size = data_width*data_height
 
 while(True):
@@ -32,6 +32,7 @@ while(True):
 
     clf = joblib.load('model.pkl')
     V = joblib.load('eigenfaces.pkl')
+    eigenfaces = V.shape[0] - 1 #TODO: ver que pasa con la ultima autocara
 
     for (x, y, width, height) in faces:
 
@@ -42,12 +43,12 @@ while(True):
         resized = cv2.resize(roi_gray, (data_width, data_height), interpolation = cv2.INTER_CUBIC)
         resized = resized/255.0
         face = np.reshape(resized, [1, area_size])
-        improy = np.dot(face, V[0:239,:].transpose())
+        improy = np.dot(face, V[0:eigenfaces, :].transpose())
 
         prediction = clf.predict(improy)
 
         label_coords = (x, y + height + 30)
-        drawLabel(frame, str(prediction[0]), label_coords)
+        drawLabel(frame, str(int(prediction[0])), label_coords)
 
     # Display the resulting frame
     cv2.imshow('frame',frame)

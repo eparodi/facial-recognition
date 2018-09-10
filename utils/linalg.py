@@ -61,8 +61,14 @@ def householderQR(m: np.matrix):
         The matrix R of the decomposition. This is an upper triangular
         matrix.
 
+    Raises
+    ------
+    InvalidMatrixException
+        If the matrix columns is bigger or equals than the number of rows.
     """
     rows, columns = m.shape
+    if columns > rows:
+        raise InvalidMatrixException('Invalid size.')
     rMatrix = np.copy(m)
     qMatrix = np.eye(rows)
     for i in range(columns - (rows == columns)):
@@ -74,7 +80,6 @@ def householderQR(m: np.matrix):
         hMatrix[i:, i:] = np.eye(xVector.shape[0])
         hMatrix[i:, i:] -= (2 / np.dot(auxVector, auxVector)) * \
             np.dot(auxVector[:, None], auxVector[None, :])
-        # hMatrix[i:, i:] = make_householder(A[i:, i])
         qMatrix = qMatrix @ hMatrix
         rMatrix = hMatrix @ rMatrix
     return qMatrix, rMatrix
@@ -113,7 +118,7 @@ def symmetricEig(m: np.matrix):
     eigenValues = m
     eigenVectors = np.eye(dimension)
     for _ in range(0, 1000):
-        qMatrix, rMatrix = moddedgramSchmidtQR(eigenValues)
+        qMatrix, rMatrix = householderQR(eigenValues)
         eigenValues = rMatrix @ qMatrix
         eigenVectors = eigenVectors @ qMatrix
 

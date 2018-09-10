@@ -154,7 +154,6 @@ def svd(m: np.matrix):
     """
     rows, columns = m.shape
     if rows < columns:
-        import ipdb; ipdb.set_trace()
         svdMatrix = m.T @ m
         singValues, vMatrix = symmetricEig(svdMatrix)
         singValues, vMatrix = _sortEig(singValues, vMatrix)

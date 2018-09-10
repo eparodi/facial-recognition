@@ -1,8 +1,10 @@
 import numpy as np
 from numpy import matlib
 
+
 class InvalidMatrixException(Exception):
     pass
+
 
 def gramSchmidtQR(m: np.matrix):
     """ Returns the matrices of the QR decomposition of the matrix.
@@ -23,15 +25,29 @@ def gramSchmidtQR(m: np.matrix):
     """
     rows, columns = m.shape
     qMatrix = np.matlib.zeros((rows, rows))
-    qMatrix[:,0] = m[:, 0] / np.linalg.norm(m[:, 0], 2)
+    qMatrix[:, 0] = m[:, 0] / np.linalg.norm(m[:, 0], 2)
     for i in range(1, columns):
         qColumn = m[:, i]
         for j in range(0, i):
             aux = np.dot(qMatrix[:, j].transpose(), m[:, i])
-            aux = aux[0,0] * qMatrix[:, j]
+            aux = aux[0, 0] * qMatrix[:, j]
             qColumn = qColumn - aux
         qMatrix[:, i] = qColumn / np.linalg.norm(qColumn, 2)
     rMatrix = np.transpose(qMatrix) @ m
+    return qMatrix, rMatrix
+
+
+def moddedgramSchmidtQR(m):
+    rows, columns = m.shape
+    qMatrix = np.matlib.zeros((rows, rows))
+    rMatrix = np.matlib.zeros((rows, rows))
+    for k in range(0, rows):
+        w = m[:, k]
+        for j in range(0, rows):
+            rMatrix[j, k] = qMatrix[:, j].transpose() * w
+            w = w - (rMatrix[j, k] * qMatrix[:, j])
+        rMatrix[k, k] = np.linalg.norm(w, 2)
+        qMatrix[:, k] = w / rMatrix[k, k]
     return qMatrix, rMatrix
 
 
@@ -63,12 +79,12 @@ def symmetricEig(m: np.matrix):
     """
     if (m.shape[0] != m.shape[1]):
         raise InvalidMatrixException('The matrix is not squared.')
-    
+
     dimension = m.shape[0]
     eigenValues = m
     eigenVectors = np.eye(dimension)
     for _ in range(0, 1000):
-        qMatrix, rMatrix = gramSchmidtQR(eigenValues)
+        qMatrix, rMatrix = moddedgramSchmidtQR(eigenValues)
         eigenValues = rMatrix @ qMatrix
         eigenVectors = eigenVectors @ qMatrix
 
@@ -116,5 +132,5 @@ def svd(m: np.matrix):
         singValues = np.sqrt(singValues)
 
         return singValues, vMatrix, None
-    
+
     return uMatrix, singValues, vMatrix

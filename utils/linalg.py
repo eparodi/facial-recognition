@@ -66,6 +66,7 @@ def householderQR(m: np.matrix):
     InvalidMatrixException
         If the matrix columns is bigger or equals than the number of rows.
     """
+    m = np.float64(m.copy())
     rows, columns = m.shape
     if columns > rows:
         raise InvalidMatrixException('Invalid size.')
@@ -121,7 +122,6 @@ def symmetricEig(m: np.matrix):
         qMatrix, rMatrix = householderQR(eigenValues)
         eigenValues = rMatrix @ qMatrix
         eigenVectors = eigenVectors @ qMatrix
-
     return eigenValues.diagonal(), eigenVectors
 
 
@@ -152,28 +152,13 @@ def svd(m: np.matrix):
         The second matrix of the decomposition. This one is
         also a orthogonal matrix.
     """
-    rows, columns = m.shape
-    if rows < columns:
-        svdMatrix = m.T @ m
-        singValues, vMatrix = symmetricEig(svdMatrix)
-        singValues, vMatrix = _sortEig(singValues, vMatrix)
-        singValues = np.sqrt(singValues)
-
-        sInvValues = [1/x for x in singValues]
-        sInv = np.eye(m.shape[1], m.shape[0])
-        np.fill_diagonal(sInv, sInvValues)
-        uMatrix = m @ vMatrix @ sInv
-        return uMatrix, singValues[:rows], vMatrix.T
-    else:
-        svdMatrix = m @ m.transpose()
-        singValues, uMatrix = symmetricEig(svdMatrix)
-        singValues, uMatrix = _sortEig(singValues, uMatrix)
-        singValues = np.sqrt(singValues)
-
-        sInvValues = [1/x for x in singValues]
-        sInv = np.eye(m.shape[1], m.shape[0])
-        np.fill_diagonal(sInv, sInvValues)
-        vMatrix = m.T @ uMatrix @ sInv.T
-        return uMatrix, singValues[:columns], vMatrix.T
-
-    return uMatrix, singValues, vMatrix
+    m = np.float64(m.copy())
+    _, columns = m.shape
+    svdMatrix = m @ m.T
+    singValues, uMatrix = symmetricEig(svdMatrix)
+    singValues, uMatrix = _sortEig(singValues, uMatrix)
+    singValues = np.sqrt(np.abs(singValues))
+    vMatrix = m.T @ uMatrix
+    for i in range(vMatrix.shape[1]):
+        vMatrix[i,:] = vMatrix[i,:] / np.linalg.norm(vMatrix[i,:])
+    return uMatrix, singValues[:columns], vMatrix.T

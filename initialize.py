@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 from sklearn import svm
 from sklearn.externals import joblib
 
-mypath      = '_GRANDE'+'/'
+mypath      = '_GRANDE2'+'/'
 onlydirs    = sorted([f for f in listdir(mypath) if isdir(join(mypath, f))])
 
 #image size
@@ -17,8 +17,9 @@ areasize    = horsize*versize
 
 #number of figures
 personno    = len(onlydirs)
-trnperper   = 6 # trn = training; tst = test
-tstperper   = 4
+trnperper   = 14 # trn = training; tst = test
+tstperper   = 6
+totalperper = tstperper +trnperper
 trnno       = personno*trnperper
 tstno       = personno*tstperper
 

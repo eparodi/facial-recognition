@@ -22,7 +22,7 @@ persontst = np.zeros([tstno,1])
 imno = 0
 per  = 0
 for dire in onlydirs:
-    for k in range(trnperper,10):
+    for k in range(trnperper,totalperper):
         a = im.imread(mypath + dire + '/{}'.format(k) + '.pgm')/255.0
         imagetst[imno,:]  = np.reshape(a,[1,areasize])
         persontst[imno,0] = per

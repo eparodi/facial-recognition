@@ -1,31 +1,7 @@
 # -*- coding: utf-8 -*-
-"""
-Created on Sun Jul  2 16:32:14 2017
 
-@author: pfierens
-"""
-from os import listdir
-from os.path import join, isdir
-from scipy import ndimage as im
-import numpy as np
-import matplotlib.pyplot as plt
-from sklearn import svm
-from sklearn.externals import joblib
-
-mypath      = 'att_faces/'
-onlydirs    = [f for f in listdir(mypath) if isdir(join(mypath, f))]
-
-#image size
-horsize     = 92
-versize     = 112
-areasize    = horsize*versize
-
-#number of figures
-personno    = 40
-trnperper   = 6 # trn = training; tst = test
-tstperper   = 4
-trnno       = personno*trnperper
-tstno       = personno*tstperper
+from initialize import *
+import utils.linalg
 
 #TRAINING SET
 images = np.zeros([trnno,areasize])
@@ -66,8 +42,9 @@ images  = [images[k,:]-meanimage for k in range(images.shape[0])]
 imagetst= [imagetst[k,:]-meanimage for k in range(imagetst.shape[0])]
 
 #PCA
-U,S,V = np.linalg.svd(images,full_matrices = False)
-joblib.dump(V, 'eigenfaces.pkl')
+#U,S,V = np.linalg.svd(images,full_matrices = False)
+U,S,V=utils.linalg.svd(images)
+# joblib.dump(V, 'eigenfaces.pkl')
 
 #Primera autocara...
 eigen1 = (np.reshape(V[0,:],[versize,horsize]))*255
@@ -85,10 +62,11 @@ fig, axes = plt.subplots(1,1)
 axes.imshow(eigen2,cmap='gray')
 fig.suptitle('Tercera autocara')
 
+#plt.show()
 
 nmax = V.shape[0]
 accs = np.zeros([nmax,1])
-for neigen in range(1,nmax):
+for neigen in range(1,nmax+1):
     #Me quedo sólo con las primeras autocaras
     B = V[0:neigen,:]
     #proyecto
@@ -99,8 +77,8 @@ for neigen in range(1,nmax):
     #entreno
     clf = svm.LinearSVC()
     clf.fit(improy,person.ravel())
-    accs[neigen] = clf.score(imtstproy,persontst.ravel())
-    print('Precisión con {0} autocaras: {1} %\n'.format(neigen,accs[neigen]*100))
+    accs[neigen-1] = clf.score(imtstproy,persontst.ravel())
+    print('Precisión con {0} autocaras: {1} %\n'.format(neigen,accs[neigen-1]*100))
 
     if neigen == nmax - 1:
         joblib.dump(clf, 'model.pkl')

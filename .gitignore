@@ -4,4 +4,3 @@ att_faces/
 *.pyc
 octave-workspace
 *.pkl
-*.pgm

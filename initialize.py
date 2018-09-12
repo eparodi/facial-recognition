@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 from sklearn import svm
 from sklearn.externals import joblib
 
-mypath      = '_GRANDE2'+'/'
+mypath      = 'dataset'+'/'
 onlydirs    = sorted([f for f in listdir(mypath) if isdir(join(mypath, f))])
 
 #image size

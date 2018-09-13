@@ -34,11 +34,8 @@ class KPCA(Method):
         #Autovalores y autovectores
         #w,alpha = np.linalg.eigh(K)
         w, self.alpha = linalg.symmetricEig(self.K)
+        w, self.alpha = linalg._sortEig(w, self.alpha)
         lambdas = w
-
-        #Los autovalores vienen en orden descendente. Lo cambio
-        lambdas = np.flipud(lambdas)
-        self.alpha = np.fliplr(self.alpha)
 
         for col in range(self.alpha.shape[1]):
             self.alpha[:, col] = self.alpha[:, col] / \

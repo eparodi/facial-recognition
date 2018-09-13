@@ -7,7 +7,7 @@ Este programa ejecuta un algoritmo para identificar rostros y luego se pone a pr
 * Eliseo Parodi Almaraz
 * Marcos Abelenda
 * Matías Ota
-* Néstor Ariel Debrouvier
+* Ariel Debrouvier
 
 ## Requerimientos
 

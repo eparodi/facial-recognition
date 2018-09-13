@@ -7,7 +7,7 @@ Este programa ejecuta un algoritmo para identificar rostros y luego se pone a pr
 * Eliseo Parodi Almaraz
 * Marcos Abelenda
 * Matías Ota
-* Néstor Ariel Devoubrier
+* Néstor Ariel Debrouvier
 
 ## Requerimientos
 
@@ -27,5 +27,5 @@ pip3 install -r requirements.txt
 Para ejecutar el programa, desde la carpeta principal, ejecute el siguiente código
 
 ```
-python3 webcam.py
+python3 main.py
 ```

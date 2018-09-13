@@ -1,0 +1,9 @@
+{
+    "path": "dataset",
+    "imageWidth": 92,
+    "imageHeight": 112,
+    "imageNumber": 20,
+    "trainImages": 14,
+    "testImages": 6,
+    "webcamInterface": "http://192.168.0.3:8080/videofeed"
+}

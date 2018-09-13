@@ -7,6 +7,9 @@ class KPCA(Method):
 
     def __init__(self, degree=2):
         super().__init__()
+        self.trainImages=(self.trainImages*255-127.5)/127.5
+        self.testImages=(self.testImages*255-127.5)/127.5
+
         self.K = None
         self.alpha = None
         self.degree = degree

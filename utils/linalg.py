@@ -6,6 +6,9 @@ class InvalidMatrixException(Exception):
     pass
 
 
+MAX_ITER = 50
+TOLERANCE = 1e-64
+
 def gramSchmidtQR(m: np.matrix):
     """ Returns the matrices of the QR decomposition of the matrix.
 
@@ -132,6 +135,47 @@ def _sortEig(eigenValues, eigenVectors):
     sortedEigVecs = eigenVectors[:, idx]
     return sortedEigVals, sortedEigVecs
 
+
+def symmetricEigHessenberg(m: np.matrix):
+    if (m.shape[0] != m.shape[1]):
+        raise InvalidMatrixException('The matrix is not squared.')
+    dimension = m.shape[0]
+    eigenValues, eigenVectors = hessenbergReduction(m)
+    for k in range(dimension, 1, -1):
+        aux1 = eigenValues[0:k, 0:k]
+        iter = 0
+        while np.abs(aux1[k-1, k-2]) > TOLERANCE or iter > MAX_ITER:
+            mu = aux1[k-1, k-1]
+            w = aux1 - mu * np.eye(k)
+            qMatrix, rMatrix = householderQR(w)
+            aux1 = rMatrix @ qMatrix + mu*np.eye(k)
+            qi = np.eye(dimension)
+            qi[0:k, 0:k] = qMatrix
+            eigenVectors = eigenVectors @ qi
+        eigenValues[0:k, 0:k] = aux1
+
+    return eigenValues.diagonal(), eigenVectors
+
+
+def householderReflector(x):
+    v = x.astype(float)
+    v[0] += np.sign(x[0])*np.linalg.norm(x)
+    v = v / np.linalg.norm(v)
+    return v
+
+def hessenbergReduction(m):
+    n = m.shape[0]
+    A = m.astype(float)
+    P = np.eye(n)
+    for k in range(0, n-2):
+        u = householderReflector(A[k+1:, k])
+        pk = np.eye(n)
+        pk[k+1:, k+1:] -= 2.0 * np.dot(u, u.transpose())
+        P = P @ pk
+        A = np.dot(pk, A)
+        A = np.dot(A, pk.transpose())
+
+    return A, P
 
 def svd(m: np.matrix):
     """ Returns the SVD of a matrix.
